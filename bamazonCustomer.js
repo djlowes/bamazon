@@ -43,18 +43,19 @@ function beginPrompt() {
   ]).then(function(answers) {
       orderId = answers.Id;
       orderQty = answers.units;
-      console.log("ItemID selected: " + orderId+ '\r\n' + "Quantity selected: " + orderQty);
-      console.log("ORDER ID IS: " + orderId)
+      console.log("ItemID selected: #" + orderId+ '\r\n' + "Quantity selected: " + orderQty + " items");
       checkOrder();
  });
 }
 
-
 function checkOrder() {
   connection.query("SELECT item_id, product_name, stock_quantity FROM products", function(err, result) {
-    if (err) throw err;
-    if(result.stock_quantity[orderId - 1] > orderQty) {
+   if (err) throw err;
+    if((orderQty) > (result[orderId -1].stock_quantity)) {
       insufficientQty();
+    } else if (orderQty == 0) {
+      console.log('\r\n' + '\r\n' + '\r\n' + "YOU NEED TO SELECT AN ITEM IN ORDER TO CHECK OUT. PLEASE TRY AGAIN." + '\r\n' + '\r\n' + '\r\n');
+      starter();
     } else {
       completeOrder();
     }
