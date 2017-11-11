@@ -33,11 +33,19 @@ function beginPrompt() {
       type: 'input',
       name: 'Id',
       message: 'What is the ID of the product you would like to buy?',
+      validate: function(input) {
+        if (input <= 10) return true;
+        return "Please enter an ID number correlating to an item for sale";
+      }
     },
     {
       type: 'input',
       name: 'units',
       message: 'How many would you like to buy?',
+      validate: function(input) {
+        if (input.match(/[0-9]/)) return true;
+        return "Please enter a quantity of item you would like to buy";
+      }
     }
   ]).then(function(answers) {
     orderId = answers.Id;
@@ -62,8 +70,19 @@ function checkOrder() {
 }
 
 function insufficientQty() {
-  console.log('\r\n' + '\r\n' + '\r\n' + "Insufficient quantity. We could not place your order" + '\r\n' + '\r\n' + '\r\n');
-  connection.end();
+  console.log('\r\n' + '\r\n' + '\r\n' + "Insufficient quantity. We could not place your order. Feel free to keep shopping." + '\r\n' + '\r\n' + '\r\n');
+  inquirer.prompt({
+    type: 'list',
+    name: 'continue',
+    message: 'Would you like to keep shopping?',
+    choices: ['Yes', 'No']
+  }).then(function(answers) {
+    if (answers.continue == "Yes") {
+      beginPrompt();
+    } else {
+      connection.end();
+    }
+  });
 }
 
 function updateDB() {
