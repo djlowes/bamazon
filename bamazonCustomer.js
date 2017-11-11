@@ -29,8 +29,7 @@ function starter() {
 }
 
 function beginPrompt() {
-  inquirer.prompt([
-    {
+  inquirer.prompt([{
       type: 'input',
       name: 'Id',
       message: 'What is the ID of the product you would like to buy?',
@@ -41,31 +40,49 @@ function beginPrompt() {
       message: 'How many would you like to buy?',
     }
   ]).then(function(answers) {
-      orderId = answers.Id;
-      orderQty = answers.units;
-      console.log("ItemID selected: #" + orderId+ '\r\n' + "Quantity selected: " + orderQty + " items");
-      checkOrder();
- });
+    orderId = answers.Id;
+    orderQty = answers.units;
+    console.log("ItemID selected: #" + orderId + '\r\n' + "Quantity selected: " + orderQty + " items");
+    checkOrder();
+  });
 }
 
 function checkOrder() {
   connection.query("SELECT item_id, product_name, stock_quantity FROM products", function(err, result) {
-   if (err) throw err;
-    if((orderQty) > (result[orderId -1].stock_quantity)) {
+    if (err) throw err;
+    if ((orderQty) > (result[orderId - 1].stock_quantity)) {
       insufficientQty();
     } else if (orderQty == 0) {
-      console.log('\r\n' + '\r\n' + '\r\n' + "YOU NEED TO SELECT AN ITEM IN ORDER TO CHECK OUT. PLEASE TRY AGAIN." + '\r\n' + '\r\n' + '\r\n');
+      console.log('\r\n' + '\r\n' + '\r\n' + "You need to select at least one item in order to checkout. Try again: " + '\r\n' + '\r\n' + '\r\n');
       starter();
     } else {
-      completeOrder();
+      updateDB();
     }
   });
 }
 
 function insufficientQty() {
-  console.log("insufficientQty worked")
+  console.log('\r\n' + '\r\n' + '\r\n' + "Insufficient quantity. We could not place your order" + '\r\n' + '\r\n' + '\r\n');
+  connection.end();
+}
+
+function updateDB() {
+  var query = "UPDATE products SET stock_quantity = stock_quantity - " + orderQty + " WHERE item_id = " + orderId;
+  connection.query(query, function(err, result) {
+    completeOrder();
+  });
 }
 
 function completeOrder() {
-  console.log("complete order worked")
+  var query = "SELECT * FROM products WHERE item_id = " + orderId;
+  connection.query(query, function(err, result) {
+    var price = (orderQty * result[0].price);
+    console.log("----------------------------------------" + '\r\n');
+    console.log("CONGRATULATIONS ON A SUCCESSFUL PURCHASE!" + '\n' + "Your order details are below:" + '\r\n');
+    console.log("Item: " + result[0].product_name);
+    console.log("Qty: " + orderQty);
+    console.log("Price: $" + price);
+    console.log("----------------------------------------")
+    connection.end();
+  });
 }
