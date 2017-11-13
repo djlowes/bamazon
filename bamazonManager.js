@@ -17,9 +17,9 @@ connection.connect(function(err) {
 function starter() {
   connection.query("SELECT * FROM products", function(err, result) {
     console.log("----------------------------------------" + '\r\n')
-    console.log("Hello Admin, please find all current products for sale here: ")
-    console.log("----------------------------------------" + '\r\n')
+    console.log("Hello Admin, please find all current products for sale here: " + '\r\n')
     console.log("ItemID |" + " Product |" + " Stock Qty |" + " Price |")
+    console.log("----------------------------------------")
     for (var i = 0; i < result.length; i++) {
       console.log("• " + result[i].item_id + " | " + result[i].product_name + " | " + result[i].stock_quantity + " items | $" + result[i].price + " | ")
     }
