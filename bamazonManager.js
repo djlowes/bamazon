@@ -91,7 +91,7 @@ function addStock() {
       {
         type: 'input',
         name: 'quantity',
-        message: 'How many items would you like to purchase?'
+        message: 'How many items would you like to add?'
       }
     ]).then(function(answers) {
       orderUpdate(answers.quantity, answers.product);
@@ -133,7 +133,7 @@ function orderUpdate(stock_quantity, product_name) {
   connection.query("UPDATE products SET stock_quantity = stock_quantity + ? WHERE product_name = ?", [stock_quantity, product_name],
     function(err, result) {
       if (err) throw err;
-      console.log("You succesfuly added " + stock_quantity + " " + product_name + " items");
+      console.log("You succesfuly added " + stock_quantity + " " + product_name + " item");
       inquirer.prompt({
         type: 'list',
         name: 'choice',
